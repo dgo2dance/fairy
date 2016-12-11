@@ -11,7 +11,7 @@ class Spider(CrawlSpider):
     name = "fairy"
     host = "https://xueqiu.cn"
 
-    start_urls = ['SP1000132','SP1003103',
+    start_urls = ['SP1000132','SP1003103','SP1007011','SP1002481','SP1000156',
     ]
     # try:
     #url_head = "https://xueqiu.com/service/tc/snowx/PAMID/cubes/rebalancing/history?cube_symbol=SP1000132"
@@ -34,7 +34,7 @@ class Spider(CrawlSpider):
                 self.finish_ID.add(ID)  # 加入已爬队列
                 ID = str(ID)
                 url_Fairy = "https://xueqiu.com/service/tc/snowx/PAMID/cubes/rebalancing/history?cube_symbol=%s" % ID
-                yield Request(url=url_Fairy, callback=self.parse)  # 去爬json
+                yield Request(url=url_Fairy, meta={"ID": ID}, callback=self.parse)  # 去爬json
 
 
     def parse(self, response):
@@ -52,6 +52,7 @@ class Spider(CrawlSpider):
            #     print type(m['rebalancing_histories'][0]['updated_at'])
            #     print 'stock_symbol:',m['rebalancing_histories'][0]['stock_symbol']
                 changeListItem=ChangeListItem()
+                changeListItem["userId"]=response.meta["ID"]
                 changeListItem["status"]=m['status']
                 changeListItem["stock_name"]=m['rebalancing_histories'][0]['stock_name']
                 changeListItem["target_weight"]=m['rebalancing_histories'][0]['target_weight']

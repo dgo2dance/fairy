@@ -11,6 +11,7 @@ from scrapy import Item, Field
 
 class ChangeListItem(Item):
     """ 个人信息 """
+    userId = Field()
     status = Field()  # 交易ID
     stock_symbol = Field()  # 股票代码
     price = Field()  # 交易价格
