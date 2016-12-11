@@ -1,17 +1,20 @@
 # encoding=utf-8
 import re
 import datetime
+import time
 import json
 from scrapy.spider import CrawlSpider
 from scrapy.selector import Selector
 from scrapy.http import Request
-from fairy.items import ChangeListItem
+from fairy.items import ChangeListItem,QuarterRankingItem
 
 class Spider(CrawlSpider):
     name = "fairy"
     host = "https://xueqiu.cn"
 
-    start_urls = ['SP1000132','SP1003103','SP1007011','SP1002481','SP1000156',
+    
+
+    start_urls = [
     ]
     # try:
     #url_head = "https://xueqiu.com/service/tc/snowx/PAMID/cubes/rebalancing/history?cube_symbol=SP1000132"
@@ -26,7 +29,20 @@ class Spider(CrawlSpider):
     finish_ID = set()  # 记录已爬url
     print 'scrawl_ID LENGTH:',len(scrawl_ID)
 
+    def  get_id(self):
+         url_quarter = "https://xueqiu.com/service/tc/snowx/PAMID/cubes/rank?tid=PAMID&period=QUARTER&page=1"
+         yield Request(url=url_quarter, callback=self.parse0) 
+
+
+
     def start_requests(self):
+
+        #self.get_id()
+        url_quarter = "https://xueqiu.com/service/tc/snowx/PAMID/cubes/rank?tid=PAMID&period=QUARTER&page=1"
+        yield Request(url=url_quarter, meta={"ID": 1},callback=self.parse0) 
+        
+        print 'len~~:',len(self.scrawl_ID)
+
         while len(self.scrawl_ID)>0:
                 ID = self.scrawl_ID.pop()
                 print 'scrawl_ID LENGTH NEIBU:',len(self.scrawl_ID)
@@ -36,6 +52,22 @@ class Spider(CrawlSpider):
                 url_Fairy = "https://xueqiu.com/service/tc/snowx/PAMID/cubes/rebalancing/history?cube_symbol=%s" % ID
                 yield Request(url=url_Fairy, meta={"ID": ID}, callback=self.parse)  # 去爬json
 
+    def parse0(self,response):
+        selector = Selector(response)
+        con = json.loads(response.body_as_unicode(),encoding="gbk")
+        for m in con['result_data']['list']:
+            quarterRankingItem = QuarterRankingItem()
+            quarterRankingItem["name"] = m['name']
+            quarterRankingItem["symbol"] = m['symbol']
+            quarterRankingItem["rate"] = m['rate']
+            quarterRankingItem["createTime"] = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()) 
+            quarterRankingItem["photo_domain"] = m['user']['photo_domain']
+            quarterRankingItem["profile_image_url"] = m['user']['profile_image_url']
+            self.scrawl_ID.add(m['symbol'])
+            print 'len~~0:',len(self.scrawl_ID)
+            print 'm_symbol:',m['symbol']
+            print 'len~~1:',len(self.scrawl_ID)
+            yield quarterRankingItem
 
     def parse(self, response):
         """ 抓取json数据 """
