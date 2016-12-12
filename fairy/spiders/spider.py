@@ -14,7 +14,7 @@ class Spider(CrawlSpider):
 
     
 
-    start_urls = [
+    start_urls = ['https://xueqiu.com/service/tc/snowx/PAMID/cubes/rank?tid=PAMID&period=QUARTER&page=1',
     ]
     # try:
     #url_head = "https://xueqiu.com/service/tc/snowx/PAMID/cubes/rebalancing/history?cube_symbol=SP1000132"
@@ -25,13 +25,13 @@ class Spider(CrawlSpider):
        # finally:
        #     file_object.close()
             #years_object.close()
-    scrawl_ID = set(start_urls)
+    scrawl_ID = set()
     finish_ID = set()  # 记录已爬url
     print 'scrawl_ID LENGTH:',len(scrawl_ID)
 
     def  get_id(self):
          url_quarter = "https://xueqiu.com/service/tc/snowx/PAMID/cubes/rank?tid=PAMID&period=QUARTER&page=1"
-         yield Request(url=url_quarter, callback=self.parse0) 
+         Request(url=url_quarter, callback=self.parse0) 
 
 
 
@@ -39,10 +39,11 @@ class Spider(CrawlSpider):
 
         #self.get_id()
         url_quarter = "https://xueqiu.com/service/tc/snowx/PAMID/cubes/rank?tid=PAMID&period=QUARTER&page=1"
-        yield Request(url=url_quarter, meta={"ID": 1},callback=self.parse0) 
+        yield Request(url=url_quarter, meta={"ID": 1},callback=self.parse2) 
         
         print 'len~~:',len(self.scrawl_ID)
-
+ 
+        """
         while len(self.scrawl_ID)>0:
                 ID = self.scrawl_ID.pop()
                 print 'scrawl_ID LENGTH NEIBU:',len(self.scrawl_ID)
@@ -50,10 +51,12 @@ class Spider(CrawlSpider):
                 self.finish_ID.add(ID)  # 加入已爬队列
                 ID = str(ID)
                 url_Fairy = "https://xueqiu.com/service/tc/snowx/PAMID/cubes/rebalancing/history?cube_symbol=%s" % ID
-                yield Request(url=url_Fairy, meta={"ID": ID}, callback=self.parse)  # 去爬json
+                yield Request(url=url_Fairy, meta={"ID": ID}, callback=self.parse1)  # 去爬调整历史
+        """
 
-    def parse0(self,response):
+    def parse2(self,response):
         selector = Selector(response)
+        print 'parse0'
         con = json.loads(response.body_as_unicode(),encoding="gbk")
         for m in con['result_data']['list']:
             quarterRankingItem = QuarterRankingItem()
@@ -63,13 +66,12 @@ class Spider(CrawlSpider):
             quarterRankingItem["createTime"] = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()) 
             quarterRankingItem["photo_domain"] = m['user']['photo_domain']
             quarterRankingItem["profile_image_url"] = m['user']['profile_image_url']
-            self.scrawl_ID.add(m['symbol'])
-            print 'len~~0:',len(self.scrawl_ID)
-            print 'm_symbol:',m['symbol']
-            print 'len~~1:',len(self.scrawl_ID)
             yield quarterRankingItem
+            url_Fairy = "https://xueqiu.com/service/tc/snowx/PAMID/cubes/rebalancing/history?cube_symbol=%s" % m['symbol']
+            yield Request(url=url_Fairy, meta={"ID": m['symbol'],"NAME":m['name']}, callback=self.parse1)  # 去爬调整历史
 
-    def parse(self, response):
+
+    def parse1(self, response):
         """ 抓取json数据 """
         selector = Selector(response)
         con = json.loads(response.body_as_unicode(),encoding="gbk") 
@@ -85,6 +87,7 @@ class Spider(CrawlSpider):
            #     print 'stock_symbol:',m['rebalancing_histories'][0]['stock_symbol']
                 changeListItem=ChangeListItem()
                 changeListItem["userId"]=response.meta["ID"]
+                changeListItem["userName"]=response.meta["NAME"]
                 changeListItem["status"]=m['status']
                 changeListItem["stock_name"]=m['rebalancing_histories'][0]['stock_name']
                 changeListItem["target_weight"]=m['rebalancing_histories'][0]['target_weight']
