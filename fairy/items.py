@@ -20,6 +20,7 @@ class ChangeListItem(Item):
     target_weight = Field()  # 目标权重
     updated_at = Field()  # 交易时间
     stock_name = Field() #股票名字
+    sign = Field() #标识
 
 #定义最近三个月实盘大赛排名
 class QuarterRankingItem(Item):

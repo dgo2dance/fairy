@@ -12,9 +12,7 @@ class Spider(CrawlSpider):
     name = "fairy"
     host = "https://xueqiu.cn"
 
-    
-
-    start_urls = ['https://xueqiu.com/service/tc/snowx/PAMID/cubes/rank?tid=PAMID&period=QUARTER&page=1',
+    start_urls = ['1','2','3','4','5',
     ]
     # try:
     #url_head = "https://xueqiu.com/service/tc/snowx/PAMID/cubes/rebalancing/history?cube_symbol=SP1000132"
@@ -25,7 +23,7 @@ class Spider(CrawlSpider):
        # finally:
        #     file_object.close()
             #years_object.close()
-    scrawl_ID = set()
+    scrawl_ID = set(start_urls)
     finish_ID = set()  # 记录已爬url
     print 'scrawl_ID LENGTH:',len(scrawl_ID)
 
@@ -38,10 +36,19 @@ class Spider(CrawlSpider):
     def start_requests(self):
 
         #self.get_id()
-        url_quarter = "https://xueqiu.com/service/tc/snowx/PAMID/cubes/rank?tid=PAMID&period=QUARTER&page=1"
-        yield Request(url=url_quarter, meta={"ID": 1},callback=self.parse2) 
+        while len(self.scrawl_ID)>0:
+            ID = self.scrawl_ID.pop()
+            url_quarter = "https://xueqiu.com/service/tc/snowx/PAMID/cubes/rank?tid=PAMID&period=QUARTER&page=%s" % ID
+            url_month = "https://xueqiu.com/service/tc/snowx/PAMID/cubes/rank?tid=PAMID&period=MONTH&page=%s" % ID
+            url_week = "https://xueqiu.com/service/tc/snowx/PAMID/cubes/rank?tid=PAMID&period=WEEK&page=%s" % ID
+            url_year = "https://xueqiu.com/service/tc/snowx/PAMID/cubes/rank?tid=PAMID&period=YEAR&page=%s" % ID
+            yield Request(url=url_quarter, meta={"ID": 1,"SIGN":"QUARTER"},callback=self.parse2) 
+            yield Request(url=url_month, meta={"ID": 1,"SIGN":"MONTH"},callback=self.parse2) 
+            yield Request(url=url_week, meta={"ID": 1,"SIGN":"WEEK"},callback=self.parse2) 
+            yield Request(url=url_year, meta={"ID": 1,"SIGN":"YEAR"},callback=self.parse2) 
+
         
-        print 'len~~:',len(self.scrawl_ID)
+            print 'len~~:',len(self.scrawl_ID)
  
         """
         while len(self.scrawl_ID)>0:
@@ -68,7 +75,7 @@ class Spider(CrawlSpider):
             quarterRankingItem["profile_image_url"] = m['user']['profile_image_url']
             yield quarterRankingItem
             url_Fairy = "https://xueqiu.com/service/tc/snowx/PAMID/cubes/rebalancing/history?cube_symbol=%s" % m['symbol']
-            yield Request(url=url_Fairy, meta={"ID": m['symbol'],"NAME":m['name']}, callback=self.parse1)  # 去爬调整历史
+            yield Request(url=url_Fairy, meta={"ID": m['symbol'],"NAME":m['name'],"SIGN":response.meta["SIGN"]}, callback=self.parse1)  # 去爬调整历史
 
 
     def parse1(self, response):
@@ -87,6 +94,7 @@ class Spider(CrawlSpider):
            #     print 'stock_symbol:',m['rebalancing_histories'][0]['stock_symbol']
                 changeListItem=ChangeListItem()
                 changeListItem["userId"]=response.meta["ID"]
+                changeListItem["sign"]=response.meta["SIGN"]
                 changeListItem["userName"]=response.meta["NAME"]
                 changeListItem["status"]=m['status']
                 changeListItem["stock_name"]=m['rebalancing_histories'][0]['stock_name']

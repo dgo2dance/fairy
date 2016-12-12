@@ -38,3 +38,7 @@ GROUP BY
 	L.STOCK_NAME  ORDER BY  con desc
 	
 
+#抓取
+select * from t_changelist q where q.STOCK_NAME='三江购物' and q.updated_at>'2016-12-12'
+	
+
