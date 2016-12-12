@@ -23,3 +23,6 @@ insert into changeList(USERNAME,STATUS,STOCK_NAME,TARGET_WEIGHT,PRICE,PREV_WEIGH
 			
 
 select * from t_changelist  t where t.TARGET_WEIGHT>t.PREV_WEIGHT_AJJUSTED  order by updated_at desc
+
+# 查询当天调整的
+select * from t_changelist  t where t.TARGET_WEIGHT>t.PREV_WEIGHT_AJJUSTED and t.updated_at>'2016-12-12' order by updated_at desc
