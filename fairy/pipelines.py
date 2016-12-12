@@ -10,12 +10,14 @@ from items import ChangeListItem,QuarterRankingItem
 from twisted.enterprise import adbapi
 import MySQLdb
 import MySQLdb.cursors
+import pymysql
 
 
 class FairyPipeline(object):
     def process_item(self, item, spider):
         return item
 
+#MongoDB存取
 class MongoDBPipleline(object):
     def __init__(self):
         clinet = pymongo.MongoClient("localhost",27017)
@@ -38,6 +40,7 @@ class MongoDBPipleline(object):
         return item
 
 
+#Mysql存取
 def dbHandle():
     conn = pymysql.connect(
         host='127.0.0.1',
@@ -48,17 +51,19 @@ def dbHandle():
     )
     return conn
 
+
+
 class MysqlPipeline(object):
     def process_item(self, item, spider):
         dbObject = dbHandle()
         cursor = dbObject.cursor()
         sql = 'insert into fairy.t_changeList(userIcon,userName,content,likes,comment) values (%s,%s,%s,%s,%s)'
-
-        try:
-            cursor.execute(sql,(item['userIcon'],item['userName'],item['content'],item['like'],item['comment']))
-            dbObject.commit()
-        except Exception,e:
-            print e
-            dbObject.rollback()
-
+        sqlChangeList = 'insert into fairy.t_changeList(USERNAME,STATUS,STOCK_NAME,TARGET_WEIGHT,PRICE,PREV_WEIGHT_AJJUSTED,USERID,STOCK_SYMBOL) values(%s,%s,%s,%s,%s,%s,%s,%s)'
+        if isinstance(item,ChangeListItem):
+            try:
+                    cursor.execute(sqlChangeList,(item['userName'],item['status'],item['stock_name'],item['target_weight'],item['price'],item['prev_weight_adjusted'],item['userId'],item['stock_symbol']))
+                    dbObject.commit()
+            except Exception,e:
+                    print e
+                    dbObject.rollback()
         return item

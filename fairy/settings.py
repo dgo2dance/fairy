@@ -20,6 +20,7 @@ DOWNLOADER_MIDDLEWARES = {
 
 ITEM_PIPELINES = {
     'fairy.pipelines.MongoDBPipleline': 300,
+    'fairy.pipelines.MysqlPipeline': 300,
 }
 
 
