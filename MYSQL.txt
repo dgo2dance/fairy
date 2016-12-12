@@ -26,3 +26,15 @@ select * from t_changelist  t where t.TARGET_WEIGHT>t.PREV_WEIGHT_AJJUSTED  orde
 
 # 查询当天调整的
 select * from t_changelist  t where t.TARGET_WEIGHT>t.PREV_WEIGHT_AJJUSTED and t.updated_at>'2016-12-12' order by updated_at desc
+
+
+
+#查询大于多个的 按照顺序调整
+
+SELECT
+	L.STOCK_NAME,
+	COUNT(distinct L.USERNAME) AS con FROM (select * from t_changelist  t where t.TARGET_WEIGHT>t.PREV_WEIGHT_AJJUSTED and t.updated_at>'2016-12-12') L
+GROUP BY
+	L.STOCK_NAME  ORDER BY  con desc
+	
+
