@@ -3,6 +3,7 @@
 
 CREATE DATABASE fairy DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
 
+DROP TABLE IF EXISTS `t_changeList`;
 CREATE TABLE `t_changeList` (
   `ID` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键ID',
   `USERNAME` varchar(200)  COMMENT '用户',
@@ -13,5 +14,12 @@ CREATE TABLE `t_changeList` (
   `PREV_WEIGHT_AJJUSTED` FLOAT(10) COMMENT '调整前权重',
   `USERID` varchar(200)  COMMENT '用户ID',
   `STOCK_SYMBOL` varchar(200)  COMMENT '用户代码',
+  `updated_at` datetime  COMMENT '交易时间',
   PRIMARY KEY (`ID`)
 )
+
+insert into changeList(USERNAME,STATUS,STOCK_NAME,TARGET_WEIGHT,PRICE,PREV_WEIGHT_AJJUSTED,USERID,STOCK_SYMBOL,STOCK_SYMBOL,updated_at)
+            values()
+			
+
+select * from t_changelist  t where t.TARGET_WEIGHT>t.PREV_WEIGHT_AJJUSTED  order by updated_at desc
