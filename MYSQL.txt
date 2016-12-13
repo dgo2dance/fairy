@@ -63,4 +63,17 @@ GROUP BY
 ORDER BY
 	con DESC
 	
+	
+	
+##创建t_QuarterRankingItem 表
+
+CREATE TABLE t_QuarterRankingItem (
+         name  CHAR(20) NOT NULL,
+         symbol  varchar(30),
+         rate FLOAT,  
+				 photo_domain varchar(30),
+				 profile_image_url varchar(30),
+				 create_time  datetime
+        )
+	
 
