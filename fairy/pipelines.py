@@ -52,7 +52,6 @@ def dbHandle():
     return conn
 
 
-
 class MysqlPipeline(object):
     def process_item(self, item, spider):
         dbObject = dbHandle()
