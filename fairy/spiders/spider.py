@@ -101,7 +101,8 @@ class Spider(CrawlSpider):
                 changeListItem["target_weight"]=m['rebalancing_histories'][0]['target_weight']
                 changeListItem["price"]=m['rebalancing_histories'][0]['price']
                 changeListItem["prev_weight_adjusted"]=m['rebalancing_histories'][0]['prev_weight_adjusted']
-                changeListItem["updated_at"]=datetime.datetime.utcfromtimestamp(float(str(m['rebalancing_histories'][0]['updated_at'])[0:10]))
+            #   changeListItem["updated_at"]=datetime.datetime.utcfromtimestamp(float(str(m['rebalancing_histories'][0]['updated_at'])[0:10]))
+                changeListItem["updated_at"]=time.localtime(float(str(m['rebalancing_histories'][0]['updated_at'])[0:10]))
                 changeListItem["stock_symbol"]=m['rebalancing_histories'][0]['stock_symbol']
                 yield changeListItem
 
