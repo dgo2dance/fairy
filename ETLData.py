@@ -52,9 +52,11 @@ try:
       stock_name = row[0]
       con = row[1]
       # 打印结果
-      print "stock_name=%s,con=%s" % (stock_name, con)
+      print "stock_name=%s,con=%s" % \
+      (stock_name, con)
       # SQL 插入语句
-      sql = "INSERT INTO t_remHistory(stock_name,  con) VALUES ('%s', '%d')" % (stock_name, con)
+      sql = "INSERT INTO t_remHistory(stock_name,  con) \
+      VALUES ('%s', '%d')" % (stock_name, con)
       cursor.execute(sql)
       db.commit()
 
