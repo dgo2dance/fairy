@@ -15,6 +15,7 @@ CREATE TABLE `t_changeList` (
   `USERID` varchar(200)  COMMENT '用户ID',
   `STOCK_SYMBOL` varchar(200)  COMMENT '用户代码',
   `updated_at` datetime  COMMENT '交易时间',
+  `sign` varchar(200)  COMMENT '来源标识',
   PRIMARY KEY (`ID`)
 )
 
@@ -40,5 +41,26 @@ GROUP BY
 
 #抓取
 select * from t_changelist q where q.STOCK_NAME='三江购物' and q.updated_at>'2016-12-12'
+
+
+## 按照周月统计分析------
+SELECT
+	L.STOCK_NAME,
+	COUNT(DISTINCT L.USERNAME) AS con
+FROM
+	(
+		SELECT
+			*
+		FROM
+			t_changelist t
+		WHERE
+			t.TARGET_WEIGHT > t.PREV_WEIGHT_AJJUSTED
+		AND t.updated_at > '2016-12-13'
+		AND t.sign in  ('WEEK','MONTH')
+	) L
+GROUP BY
+	L.STOCK_NAME
+ORDER BY
+	con DESC
 	
 
