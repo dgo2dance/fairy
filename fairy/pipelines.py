@@ -11,6 +11,7 @@ from twisted.enterprise import adbapi
 import MySQLdb
 import MySQLdb.cursors
 import pymysql
+import pdb
 
 
 class FairyPipeline(object):
@@ -52,18 +53,34 @@ def dbHandle():
     return conn
 
 
-
 class MysqlPipeline(object):
     def process_item(self, item, spider):
         dbObject = dbHandle()
         cursor = dbObject.cursor()
         sql = 'insert into fairy.t_changeList(userIcon,userName,content,likes,comment) values (%s,%s,%s,%s,%s)'
         sqlChangeList = 'insert into fairy.t_changeList(USERNAME,STATUS,STOCK_NAME,TARGET_WEIGHT,PRICE,PREV_WEIGHT_AJJUSTED,USERID,STOCK_SYMBOL,updated_at,sign) values(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)'
+        sqlQuarterRankingItem = 'insert into fairy.t_quarterrankingItem(name,symbol,rate,photo_domain,profile_image_url,create_time) values(%s,%s,%s,%s,%s,%s)'
+        print 'item type:',type(item)
         if isinstance(item,ChangeListItem):
             try:
                     cursor.execute(sqlChangeList,(item['userName'],item['status'],item['stock_name'],item['target_weight'],item['price'],item['prev_weight_adjusted'],item['userId'],item['stock_symbol'],item['updated_at'],item['sign']))
                     dbObject.commit()
             except Exception,e:
                     print e
-                    dbObject.rollback()
+                    pass
+        elif isinstance(item,QuarterRankingItem):
+            try:    
+                    #pdb.set_trace()
+                    print 'name:',item['name']
+                    print 'symbol',item['symbol']
+                    print 'rate',item['rate']
+                    print 'photo_domain',item['photo_domain']
+                    print 'profile_image_url',item['profile_image_url']
+                    print 'createTime',item['createTime']
+                    print 'QuarterRankingItem:',sqlQuarterRankingItem
+                    cursor.execute(sqlQuarterRankingItem,(item['name'],item['symbol'],item['rate'],item['photo_domain'],item['profile_image_url'],item['createTime']))
+                    dbObject.commit()
+            except Exception,e:
+                    print e
+                    pass
         return item
