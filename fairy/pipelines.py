@@ -11,6 +11,7 @@ from twisted.enterprise import adbapi
 import MySQLdb
 import MySQLdb.cursors
 import pymysql
+import pdb
 
 
 class FairyPipeline(object):
@@ -58,16 +59,21 @@ class MysqlPipeline(object):
         cursor = dbObject.cursor()
         sql = 'insert into fairy.t_changeList(userIcon,userName,content,likes,comment) values (%s,%s,%s,%s,%s)'
         sqlChangeList = 'insert into fairy.t_changeList(USERNAME,STATUS,STOCK_NAME,TARGET_WEIGHT,PRICE,PREV_WEIGHT_AJJUSTED,USERID,STOCK_SYMBOL,updated_at,sign) values(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)'
-        sqlQuarterRankingItem = 'insert into fairy.t_QuarterRankingItem(name,symbol,rate,photo_domain,profile_image_url,create_time) values(%s,%s,%s,%s,%s)'
+        sqlQuarterRankingItem = 'insert into fairy.t_QuarterRankingItem(name,symbol,rate,photo_domain,profile_image_url,create_time) values(%s,%s,%s,%s,%s,%s)'
+        print 'item type:',type(item)
         if isinstance(item,ChangeListItem):
             try:
                     cursor.execute(sqlChangeList,(item['userName'],item['status'],item['stock_name'],item['target_weight'],item['price'],item['prev_weight_adjusted'],item['userId'],item['stock_symbol'],item['updated_at'],item['sign']))
                     dbObject.commit()
             except Exception,e:
                     print e
-                    dbObject.rollback()
+                    pass
         elif isinstance(item,QuarterRankingItem):
             try:    
+                    pdb.set_trace()
+                    # print 'QuarterRankingItem:',sql
                     cursor.execute(sqlQuarterRankingItem,(item['name'],item['symbol'],item['rate'],item['photo_domain'],item['profile_image_url'],item['createTime']))
-
+            except Exception,e:
+                    print e
+                    pass
         return item
