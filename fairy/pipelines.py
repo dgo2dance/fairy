@@ -71,7 +71,7 @@ class MysqlPipeline(object):
         elif isinstance(item,QuarterRankingItem):
             try:    
                     pdb.set_trace()
-                    # print 'QuarterRankingItem:',sql
+                    print 'QuarterRankingItem:',sql
                     cursor.execute(sqlQuarterRankingItem,(item['name'],item['symbol'],item['rate'],item['photo_domain'],item['profile_image_url'],item['createTime']))
             except Exception,e:
                     print e
