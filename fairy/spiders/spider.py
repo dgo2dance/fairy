@@ -70,6 +70,7 @@ class Spider(CrawlSpider):
             quarterRankingItem["name"] = m['name']
             quarterRankingItem["symbol"] = m['symbol']
             quarterRankingItem["rate"] = m['rate']
+            quarterRankingItem["sign"] = response.meta["SIGN"]
             quarterRankingItem["createTime"] = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()) 
             quarterRankingItem["photo_domain"] = m['user']['photo_domain']
             quarterRankingItem["profile_image_url"] = m['user']['profile_image_url']

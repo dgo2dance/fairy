@@ -30,6 +30,7 @@ class QuarterRankingItem(Item):
     createTime = Field()
     photo_domain = Field()
     profile_image_url = Field()
+    sign = Field()
 
 #定义最近一个月实盘大赛排名
 class MonthRankingItem(Item):

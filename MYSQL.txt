@@ -67,13 +67,24 @@ ORDER BY
 	
 ##创建t_QuarterRankingItem 表
 
+DROP TABLE IF EXISTS `t_QuarterRankingItem`;
 CREATE TABLE t_QuarterRankingItem (
          name  CHAR(20) NOT NULL,
          symbol  varchar(30),
          rate FLOAT,  
 				 photo_domain varchar(30),
-				 profile_image_url varchar(30),
-				 create_time  datetime
+				 profile_image_url varchar(200),
+				 create_time  datetime,
+				 sign varchar(30)
         )
 	
 
+## 查询所有市盈率大于1的
+SELECT
+	*
+FROM
+	t_changelist q
+where q.username in (
+
+select name from 
+t_quarterrankingitem s where s.rate>1) and TARGET_WEIGHT>PREV_WEIGHT_AJJUSTED AND UPDATED_AT>'2016-12-14' order by updated_at desc
