@@ -8,6 +8,8 @@ from scrapy.selector import Selector
 from scrapy.http import Request
 from fairy.items import ChangeListItem,QuarterRankingItem
 
+
+
 class Spider(CrawlSpider):
     name = "fairy"
     host = "https://xueqiu.cn"
