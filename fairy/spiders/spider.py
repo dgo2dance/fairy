@@ -7,6 +7,7 @@ from scrapy.spider import CrawlSpider
 from scrapy.selector import Selector
 from scrapy.http import Request
 from fairy.items import ChangeListItem,QuarterRankingItem
+import pdb
 
 
 
@@ -26,7 +27,7 @@ class Spider(CrawlSpider):
        #     file_object.close()
             #years_object.close()
     scrawl_ID = set(start_urls)
-    finish_ID = set()  # 记录已爬url
+    finish_ID = set()  # 记录已爬人员
     print 'scrawl_ID LENGTH:',len(scrawl_ID)
 
     def  get_id(self):
@@ -77,14 +78,18 @@ class Spider(CrawlSpider):
             quarterRankingItem["photo_domain"] = m['user']['photo_domain']
             quarterRankingItem["profile_image_url"] = m['user']['profile_image_url']
             yield quarterRankingItem
-            url_Fairy = "https://xueqiu.com/service/tc/snowx/PAMID/cubes/rebalancing/history?cube_symbol=%s" % m['symbol']
-            yield Request(url=url_Fairy, meta={"ID": m['symbol'],"NAME":m['name'],"SIGN":response.meta["SIGN"]}, callback=self.parse1)  # 去爬调整历史
+            if m['symbol'] not in self.finish_ID:
+                url_Fairy = "https://xueqiu.com/service/tc/snowx/PAMID/cubes/rebalancing/history?cube_symbol=%s" % m['symbol']
+                yield Request(url=url_Fairy, meta={"ID": m['symbol'],"NAME":m['name'],"SIGN":response.meta["SIGN"]}, callback=self.parse1)  # 去爬调整历史
 
 
     def parse1(self, response):
         """ 抓取json数据 """
         selector = Selector(response)
         con = json.loads(response.body_as_unicode(),encoding="gbk") 
+        #假如已爬队列
+        if response.meta["ID"] not in self.finish_ID:
+            self.finish_ID.add(response.meta["ID"])
 
         for m in con['list']:
            #     print 'status:',m['status']
@@ -108,9 +113,15 @@ class Spider(CrawlSpider):
                 changeListItem["updated_at"]=time.localtime(float(str(m['rebalancing_histories'][0]['updated_at'])[0:10]))
                 changeListItem["stock_symbol"]=m['rebalancing_histories'][0]['stock_symbol']
                 yield changeListItem
-
-
-        #dic 类型遍历
+        #pdb.set_trace()
+        if  con['page']< con['maxPage']:
+            nextPage = con['page']+1
+            print '------nextPage',nextPage
+            url_next = "https://xueqiu.com/service/tc/snowx/PAMID/cubes/rebalancing/history?cube_symbol=%s&page=%s" % (response.meta["ID"],nextPage)
+            print url_next;
+            yield Request(url=url_next, meta={"ID": response.meta["ID"],"SIGN":response.meta["SIGN"],"NAME":response.meta["NAME"]}, callback=self.parse1)
+     
+           #dic 类型遍历
         #for key ,name in con.items():
         #    print key,':',name
       
